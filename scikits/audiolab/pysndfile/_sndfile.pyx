@@ -311,7 +311,7 @@ def available_file_formats():
     ret = []
     for i in _major_formats_int():
         # Handle the case where libsndfile supports a format we don't
-        if not _ENUM_TO_STR_FILE_FORMAT.has_key(i & SF_FORMAT_TYPEMASK):
+        if not (i & SF_FORMAT_TYPEMASK) in _ENUM_TO_STR_FILE_FORMAT:
             warnings.warn("Format %#10x supported by libsndfile but not "
                           "yet supported by audiolab" %
                           (i & SF_FORMAT_TYPEMASK))
@@ -321,13 +321,13 @@ def available_file_formats():
 
 def available_encodings(major):
     """Return lists of available encoding for the given major format."""
-    if not _SNDFILE_FILE_FORMAT.has_key(major):
+    if not major in _SNDFILE_FILE_FORMAT:
         raise ValueError("Unknown file format %s" % major)
 
     ret = []
     for i in _sub_formats_int(_SNDFILE_FILE_FORMAT[major]):
         # Handle the case where libsndfile supports an encoding we don't
-        if not _ENUM_TO_STR_ENCODING.has_key(i & SF_FORMAT_SUBMASK):
+        if not (i & SF_FORMAT_SUBMASK) in _ENUM_TO_STR_ENCODING:
             warnings.warn("Encoding %#10x supported by libsndfile but not "
                           "yet supported by audiolab" %
                           (i & SF_FORMAT_SUBMASK))
