@@ -31,8 +31,9 @@
 
 import numpy as np
 cimport numpy as cnp
-cimport stdlib
-cimport python_exc
+from libc.stdlib cimport *
+from libc.string cimport strlen
+from cpython.exc cimport *
 from alsa cimport *
 
 cdef int BUFFER_TIME  = 500000
@@ -45,7 +46,7 @@ cdef extern from "alsa/asoundlib.h":
         int snd_pcm_sw_params_alloca(snd_pcm_sw_params_t **)
 
 cdef extern from "Python.h":
-        object PyString_FromStringAndSize(char *v, int len)
+        object PyUnicode_FromStringAndSize(char *v, int len)
 
 class AlsaException(Exception):
         pass
@@ -71,8 +72,8 @@ def enumerate_devices():
                 #names.append(PyString_FromStringAndSize(name, stdlib.strlen(name)))
                 #if name != NULL:
                 #        stdlib.free(name)
-                devices.append(PyString_FromStringAndSize(hints[card], 
-                        stdlib.strlen(hints[card])))
+                devices.append(PyUnicode_FromStringAndSize(hints[card],
+                        strlen(hints[card])))
                 card += 1
         snd_device_name_free_hint(<void**>hints)
 
@@ -138,7 +139,7 @@ cdef class AlsaDevice:
                         raise AlsaException("Error while preparing the pcm device")
 
                 for i in range(nr):
-                        err = python_exc.PyErr_CheckSignals()
+                        err = PyErr_CheckSignals()
                         if err != 0:
                                 break
                         # We make sure the buffer is in fortran order to deal
@@ -182,7 +183,7 @@ cdef set_hw_params(snd_pcm_t *hdl, format_info info, snd_pcm_uframes_t* period_s
         if st < 0:
                 raise AlsaException("Error in _any")
 
-        # Restrict sampling rates to the ones supported by the hardware 
+        # Restrict sampling rates to the ones supported by the hardware
         st = snd_pcm_hw_params_set_rate_resample(hdl, params, 1)
         if st < 0:
                 raise AlsaException("Error in _set_rate_resample")
