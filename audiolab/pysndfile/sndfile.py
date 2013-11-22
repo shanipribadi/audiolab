@@ -1,6 +1,5 @@
 from ._sndfile import sndfile_version, Format
 from ._sndfile import *
-import ._sndfile
 
 print(sndfile_version())
 

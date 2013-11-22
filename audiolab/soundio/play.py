@@ -63,7 +63,7 @@ elif BACKEND == 'CoreAudio':
     try:
         from audiolab.soundio.macosx_backend import CoreAudioDevice
     except ImportError as e:
-        print e
+        print(e)
         warnings.warn("Could not import CoreAudio backend; most probably, "
                       "you did not have CoreAudio headers when building audiolab")
 
